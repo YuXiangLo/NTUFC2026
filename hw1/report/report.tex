@@ -60,15 +60,17 @@ R14944037 Yu Xiang Luo\\
 			\begin{enumerate}
 				\item $S_0e^{(r-q-\frac{1}{2}\sigma^2)T + \sigma\sqrt{T}Z} > K$
 				\item $(r-q-\frac{1}{2}\sigma^2)T + \sigma\sqrt{T}Z > \ln\left(\frac{K}{S_0}\right)$
-				\item $Z$: $\sigma\sqrt{T}Z > \ln\left(\frac{K}{S_0}\right) - (r-q-\frac{1}{2}\sigma^2)T$
+				\item $\sigma\sqrt{T}Z > \ln\left(\frac{K}{S_0}\right) - (r-q-\frac{1}{2}\sigma^2)T$
 				\item $\sigma\sqrt{T}Z > -\ln\left(\frac{S_0}{K}\right) - (r-q-\frac{1}{2}\sigma^2)T$
 				\item $Z > \frac{-\ln(S_0/K) - (r-q-\frac{1}{2}\sigma^2)T}{\sigma\sqrt{T}}$
 				\item $Z < \frac{\ln(S_0/K) + (r-q-\frac{1}{2}\sigma^2)T}{\sigma\sqrt{T}}$, By the symmetry of normal distribution
 				\item Define $d_2(K) = \frac{\ln(S_0/K) + (r-q-\frac{1}{2}\sigma^2)T}{\sigma\sqrt{T}}$
 			\end{enumerate}
 	\end{itemize}
-	$d_2(K)$ is the probability of $S_T$ reaching $K$. Therefore:
+	$d_2(K)$ is the z-score of $S_T$ reaching $K$, and $N(d_2(K))$ is the probability of $S_T$ reaching $K$. Therefore:
 	$$E^Q[1_A] = N(d2(K1)) - N(d2(K2))$$
+	$$E^Q[1_B] = N(d2(K2)) - N(d2(K3))$$
+	$$E^Q[1_C] = N(d2(K3)) - N(d2(K4))$$
 	To calculate $E^Q[S_T \cdot 1_A]$, we define a Radon-Nikodym derivative $\Lambda = e^{-\frac{\sigma^2}{2}T + \sigma \Delta Z^Q(T)}$ to 
 	change from measure $Q$ to measure $R$. Setting $H(t) = -\sigma$ in the Girsanov theorem, the relation between $Q$ and $R$ measure
 	would be:
@@ -104,8 +106,8 @@ def N(x: float) -> float:
 
 def calc_d1(S0, K, T, r, q, sigma)
     return (
-		math.log(S0 / K) 
-		+ (r - q + 0.5 * sigma**2) * T) / (sigma * math.sqrt(T)
+		(math.log(S0 / K) + (r - q + 0.5 * sigma**2) * T)
+		/ (sigma * math.sqrt(T)
 	)
 
 def calc_d2(d1_val, T, sigma):
