@@ -103,13 +103,15 @@ def main() -> None:
         K4=config.K4,
     )
 
-    print("Bonus 1 replication with plain-vanilla calls")
-    print(f"a = (K2-K1)/(K4-K3) = {result['a']:.6f}")
-    print(f"C(K1) = {result['C(K1)']:.6f}")
-    print(f"C(K2) = {result['C(K2)']:.6f}")
-    print(f"C(K3) = {result['C(K3)']:.6f}")
-    print(f"C(K4) = {result['C(K4)']:.6f}")
-    print(f"Option value = {result['value']:.6f}")
+    # print(f"a = (K2-K1)/(K4-K3) = {result['a']:.6f}")
+    # print(f"C(K1) = {result['C(K1)']:.6f}")
+    # print(f"C(K2) = {result['C(K2)']:.6f}")
+    # print(f"C(K3) = {result['C(K3)']:.6f}")
+    # print(f"C(K4) = {result['C(K4)']:.6f}")
+    print('>' * 50)
+    print("Bonus 1 Black Scholes pricing")
+    print(f"Black-Scholes\t= {result['value']}")
+    print('<' * 50)
 
 
 if __name__ == "__main__":

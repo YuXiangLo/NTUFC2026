@@ -130,13 +130,15 @@ def main() -> None:
         seed=config.MC_RANDOM_SEED,
     )
 
+    print('=' * 50)
     print("Bonus 2 Monte Carlo pricing")
     print(f"samples per repetition = {config.MC_NUM_SAMPLES}")
-    print(f"number of repetitions   = {config.MC_NUM_REPETITIONS}")
-    print(f"random seed             = {config.MC_RANDOM_SEED}")
-    print(f"mean of 20 repetitions  = {result['mean']:.6f}")
-    print(f"s.d. of 20 repetitions  = {result['sd']:.6f}")
-    print(f"95% CI (mean +/- 2*sd)  = [{result['ci_low']:.6f}, {result['ci_high']:.6f}]")
+    print(f"number of repetitions  = {config.MC_NUM_REPETITIONS}")
+    print(f"random seed            = {config.MC_RANDOM_SEED}")
+    print(f"mean of 20 repetitions = {result['mean']:.6f}")
+    print(f"s.d. of 20 repetitions = {result['sd']:.6f}")
+    print(f"95% CI (mean +/- 2*sd) = [{result['ci_low']:.6f}, {result['ci_high']:.6f}]")
+    print('=' * 50)
 
 
 if __name__ == "__main__":

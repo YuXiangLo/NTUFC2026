@@ -68,12 +68,14 @@ def main():
     V0 = segment_1 + segment_2 + segment_3
 
     # Output results
-    print("--- Raw Martingale Pricing Execution ---")
-    print(f"Segment [K1, K2] Value: {segment_1:.4f}")
-    print(f"Segment [K2, K3] Value: {segment_2:.4f}")
-    print(f"Segment [K3, K4] Value: {segment_3:.4f}")
-    print("-" * 38)
-    print(f"Final Option Value (V0): {V0:.4f}")
+    # print("--- Raw Martingale Pricing Execution ---")
+    # print(f"Segment [K1, K2] Value: {segment_1:.6f}")
+    # print(f"Segment [K2, K3] Value: {segment_2:.6f}")
+    # print(f"Segment [K3, K4] Value: {segment_3:.6f}")
+    # print("-" * 38)
+    print('-' * 50)
+    print(f"Martingale\t= {V0}")
+    print('-' * 50)
 
 if __name__ == "__main__":
     main()
