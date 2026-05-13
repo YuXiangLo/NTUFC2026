@@ -11,13 +11,14 @@ from combinatorial import combinatorial_method
 
 def run_assignment():
     # --- Input Parameters ---
-    S0 = 100.0
-    K = 100.0
-    r = 0.05
-    q = 0.02
-    sigma = 0.3
+    S0 = 50.0
+    K = 50.0
+    r = 0.1
+    q = 0.05
+    sigma = 0.4
     T = 0.5
-    n = 105
+    n = 100
+    comb_n = 10000
     num_simulations = 10000
     num_repetitions = 20
 
@@ -34,7 +35,7 @@ def run_assignment():
     crr_2d_call = crr_binomial_tree_2d(S0, K, r, q, sigma, T, n, 'call', 'european')
     crr_1d_call = crr_binomial_tree_1d(S0, K, r, q, sigma, T, n, 'call', 'european')
     bbs_call_val = bbs_tree(S0, K, r, q, sigma, T, n, 'call', 'european')
-    comb_call = combinatorial_method(S0, K, r, q, sigma, T, n, 'call')
+    comb_call = combinatorial_method(S0, K, r, q, sigma, T, comb_n, 'call')
 
     print(f"{'Black-Scholes:':<25} {bs_call:.6f}")
     print(f"{'Monte Carlo:':<25} {mc_call_val:.6f} (95% CI: [{mc_call_ci[0]:.6f}, {mc_call_ci[1]:.6f}])")
@@ -59,7 +60,7 @@ def run_assignment():
     crr_2d_put = crr_binomial_tree_2d(S0, K, r, q, sigma, T, n, 'put', 'european')
     crr_1d_put = crr_binomial_tree_1d(S0, K, r, q, sigma, T, n, 'put', 'european')
     bbs_put_val = bbs_tree(S0, K, r, q, sigma, T, n, 'put', 'european')
-    comb_put = combinatorial_method(S0, K, r, q, sigma, T, n, 'put')
+    comb_put = combinatorial_method(S0, K, r, q, sigma, T, comb_n, 'put')
 
     print(f"{'Black-Scholes:':<25} {bs_put:.6f}")
     print(f"{'Monte Carlo:':<25} {mc_put_val:.6f} (95% CI: [{mc_put_ci[0]:.6f}, {mc_put_ci[1]:.6f}])")
