@@ -1,5 +1,6 @@
 import numpy as np
 import config
+from cholesky import cholesky
 
 def price_bonus_1(Z_half):
     """
@@ -15,7 +16,7 @@ def price_bonus_1(Z_half):
     Z_matched = Z_anti / Z_std
     
     # Cholesky decomposition of target correlation matrix
-    L = np.linalg.cholesky(config.rho)
+    L = cholesky(config.rho)
     
     # Induce correlation
     Z_corr = Z_matched @ L.T

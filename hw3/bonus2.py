@@ -1,5 +1,6 @@
 import numpy as np
 import config
+from cholesky import cholesky
 
 def price_bonus_2(Z_half):
     """
@@ -14,14 +15,14 @@ def price_bonus_2(Z_half):
     sample_cov = np.cov(Z_anti, rowvar=False)
     
     # Perform Cholesky decomposition on the SAMPLE covariance matrix
-    L_hat = np.linalg.cholesky(sample_cov)
+    L_hat = cholesky(sample_cov)
     L_hat_inv = np.linalg.inv(L_hat)
     
     # Orthogonalize the samples (force sample correlation to be identity matrix)
     Z_uncorr = Z_anti @ L_hat_inv.T
     
     # 3. Induce TARGET correlation
-    L = np.linalg.cholesky(config.rho)
+    L = cholesky(config.rho)
     Z_corr = Z_uncorr @ L.T
     
     # Calculate terminal stock prices

@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import stats
 import config
+from cholesky import cholesky
 from basic_method import price_basic
 from bonus1 import price_bonus_1
 from bonus2 import price_bonus_2
@@ -12,6 +13,62 @@ def calculate_ci(results):
     ci_half_width = 1.96 * std_err
     return mean_val, (mean_val - ci_half_width, mean_val + ci_half_width), ci_half_width * 2
 
+
+def _fmt_vector(vec):
+    return np.array2string(vec, precision=4, suppress_small=True)
+
+
+def _fmt_matrix(mat):
+    return np.array2string(mat, precision=4, suppress_small=True)
+
+
+def print_diagnostics(Z_half):
+    print("=" * 80)
+    print("Diagnostics (using first repetition Z_half)")
+    print("=" * 80)
+
+    # Antithetic checks
+    Z = Z_half
+    Z_anti = np.vstack((Z, -Z))
+    print("\n[Antithetic checks]")
+    print(f"mean(Z):      {_fmt_vector(np.mean(Z, axis=0))}")
+    print(f"mean(Z_anti): {_fmt_vector(np.mean(Z_anti, axis=0))}")
+    print(f"std(Z):       {_fmt_vector(np.std(Z, axis=0, ddof=1))}")
+    print(f"std(Z_anti):  {_fmt_vector(np.std(Z_anti, axis=0, ddof=1))}")
+
+    # Bonus 1 checks
+    Z_std = np.std(Z_anti, axis=0, ddof=1)
+    Z_matched = Z_anti / Z_std
+    print("\n[Moment matching checks - Bonus 1]")
+    print(f"mean(Z_matched): {_fmt_vector(np.mean(Z_matched, axis=0))}")
+    print(f"std(Z_matched):  {_fmt_vector(np.std(Z_matched, axis=0, ddof=1))}")
+
+    # Bonus 2 checks
+    sample_cov = np.cov(Z_anti, rowvar=False)
+    L_hat = cholesky(sample_cov)
+    L_hat_inv = np.linalg.inv(L_hat)
+    Z_uncorr = Z_anti @ L_hat_inv.T
+    L = cholesky(config.rho)
+    Z_corr = Z_uncorr @ L.T
+
+    print("\n[Inverse Cholesky checks - Bonus 2]")
+    print("cov(Z_anti):")
+    print(_fmt_matrix(sample_cov))
+    print("cov(Z_uncorr) (should be close to I):")
+    print(_fmt_matrix(np.cov(Z_uncorr, rowvar=False)))
+    print("cov(Z_corr) (should be close to rho):")
+    print(_fmt_matrix(np.cov(Z_corr, rowvar=False)))
+
+    # Normality checks
+    print("\n[Normality checks]")
+    for label, data in (("Z_uncorr", Z_uncorr), ("Z_corr", Z_corr)):
+        mean_vec = np.mean(data, axis=0)
+        std_vec = np.std(data, axis=0, ddof=1)
+        skew_vec = stats.skew(data, axis=0, bias=False)
+        print(f"{label} mean: {_fmt_vector(mean_vec)}")
+        print(f"{label} std:  {_fmt_vector(std_vec)}")
+        print(f"{label} skew: {_fmt_vector(skew_vec)}")
+
 def main():
     np.random.seed(42) # Set seed for reproducibility
     
@@ -20,6 +77,11 @@ def main():
     results_b2 = []
 
     print(f"Running {config.R} repetitions of {config.M} simulations each...\n")
+
+    # Print one detailed transformation audit before the Monte Carlo loop.
+    Z_diag = np.random.standard_normal((int(config.M / 2), config.n))
+    print_diagnostics(Z_diag)
+    print()
 
     for i in range(config.R):
         # Generate Common Random Numbers (CRN) for this repetition
@@ -39,7 +101,7 @@ def main():
         results_b1.append(val_b1)
         results_b2.append(val_b2)
 
-    # Calculate statistics
+            # Calculate statistics
     mean_basic, ci_basic, width_basic = calculate_ci(results_basic)
     mean_b1, ci_b1, width_b1 = calculate_ci(results_b1)
     mean_b2, ci_b2, width_b2 = calculate_ci(results_b2)

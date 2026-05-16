@@ -1,5 +1,6 @@
 import numpy as np
 import config
+from cholesky import cholesky
 
 def price_basic(Z):
     """
@@ -7,7 +8,7 @@ def price_basic(Z):
     Z: Crude random normal matrix of shape (M, n)
     """
     # Cholesky decomposition of target correlation matrix
-    L = np.linalg.cholesky(config.rho)
+    L = cholesky(config.rho)
     
     # Induce correlation
     Z_corr = Z @ L.T
