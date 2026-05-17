@@ -2,16 +2,18 @@ import numpy as np
 import config
 from cholesky import cholesky
 
+def generate_samples(Z):
+    """Induces correlation in crude random normals."""
+    L = cholesky(config.rho)
+    return Z @ L.T
+
 def price_basic(Z):
     """
     Prices the maximum rainbow option using standard Cholesky decomposition.
     Z: Crude random normal matrix of shape (M, n)
     """
-    # Cholesky decomposition of target correlation matrix
-    L = cholesky(config.rho)
-    
     # Induce correlation
-    Z_corr = Z @ L.T
+    Z_corr = generate_samples(Z)
     
     # Calculate terminal stock prices (Geometric Brownian Motion)
     drift = (config.r - config.q - 0.5 * config.sigma**2) * config.T

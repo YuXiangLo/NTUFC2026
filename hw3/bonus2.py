@@ -2,28 +2,32 @@ import numpy as np
 import config
 from cholesky import cholesky
 
-def price_bonus_2(Z_half):
-    """
-    Prices using Antithetic Variates + Inverse Cholesky method (Wang 2008).
-    Z_half: Crude random normal matrix of shape (M/2, n)
-    """
+def generate_samples(Z_half):
+    """Applies Antithetic Variates + Inverse Cholesky method (Wang 2008)."""
     # 1. Antithetic Variates
     Z_anti = np.vstack((Z_half, -Z_half))
     
     # 2. Inverse Cholesky
-    # Compute the sample covariance matrix of the combined antithetic samples
     sample_cov = np.cov(Z_anti, rowvar=False)
-    
-    # Perform Cholesky decomposition on the SAMPLE covariance matrix
     L_hat = cholesky(sample_cov)
     L_hat_inv = np.linalg.inv(L_hat)
     
-    # Orthogonalize the samples (force sample correlation to be identity matrix)
+    # Orthogonalize the samples
     Z_uncorr = Z_anti @ L_hat_inv.T
     
     # 3. Induce TARGET correlation
     L = cholesky(config.rho)
     Z_corr = Z_uncorr @ L.T
+    
+    return Z_corr, Z_uncorr, sample_cov
+
+def price_bonus_2(Z_half):
+    """
+    Prices using Antithetic Variates + Inverse Cholesky method (Wang 2008).
+    Z_half: Crude random normal matrix of shape (M/2, n)
+    """
+    # Generate transformed samples
+    Z_corr, _, _ = generate_samples(Z_half)
     
     # Calculate terminal stock prices
     drift = (config.r - config.q - 0.5 * config.sigma**2) * config.T

@@ -2,9 +2,9 @@ import numpy as np
 from scipy import stats
 import config
 from cholesky import cholesky
-from basic_method import price_basic
-from bonus1 import price_bonus_1
-from bonus2 import price_bonus_2
+import basic_method
+import bonus1
+import bonus2
 
 def calculate_ci(results):
     """Calculates mean and 95% Confidence Interval for a list of estimates."""
@@ -28,40 +28,33 @@ def print_diagnostics(Z_half):
     print("=" * 80)
 
     # Antithetic checks
-    Z = Z_half
-    Z_anti = np.vstack((Z, -Z))
+    Z_anti = np.vstack((Z_half, -Z_half))
     print("\n[Antithetic checks]")
-    print(f"mean(Z):      {_fmt_vector(np.mean(Z, axis=0))}")
+    print(f"mean(Z_half): {_fmt_vector(np.mean(Z_half, axis=0))}")
     print(f"mean(Z_anti): {_fmt_vector(np.mean(Z_anti, axis=0))}")
-    print(f"std(Z):       {_fmt_vector(np.std(Z, axis=0, ddof=1))}")
+    print(f"std(Z_half):  {_fmt_vector(np.std(Z_half, axis=0, ddof=1))}")
     print(f"std(Z_anti):  {_fmt_vector(np.std(Z_anti, axis=0, ddof=1))}")
 
     # Bonus 1 checks
-    Z_std = np.std(Z_anti, axis=0, ddof=1)
-    Z_matched = Z_anti / Z_std
+    Z_corr_b1, Z_matched_b1 = bonus1.generate_samples(Z_half)
     print("\n[Moment matching checks - Bonus 1]")
-    print(f"mean(Z_matched): {_fmt_vector(np.mean(Z_matched, axis=0))}")
-    print(f"std(Z_matched):  {_fmt_vector(np.std(Z_matched, axis=0, ddof=1))}")
+    print(f"mean(Z_matched): {_fmt_vector(np.mean(Z_matched_b1, axis=0))}")
+    print(f"std(Z_matched):  {_fmt_vector(np.std(Z_matched_b1, axis=0, ddof=1))}")
 
     # Bonus 2 checks
-    sample_cov = np.cov(Z_anti, rowvar=False)
-    L_hat = cholesky(sample_cov)
-    L_hat_inv = np.linalg.inv(L_hat)
-    Z_uncorr = Z_anti @ L_hat_inv.T
-    L = cholesky(config.rho)
-    Z_corr = Z_uncorr @ L.T
+    Z_corr_b2, Z_uncorr_b2, sample_cov_b2 = bonus2.generate_samples(Z_half)
 
     print("\n[Inverse Cholesky checks - Bonus 2]")
     print("cov(Z_anti):")
-    print(_fmt_matrix(sample_cov))
+    print(_fmt_matrix(sample_cov_b2))
     print("cov(Z_uncorr) (should be close to I):")
-    print(_fmt_matrix(np.cov(Z_uncorr, rowvar=False)))
+    print(_fmt_matrix(np.cov(Z_uncorr_b2, rowvar=False)))
     print("cov(Z_corr) (should be close to rho):")
-    print(_fmt_matrix(np.cov(Z_corr, rowvar=False)))
+    print(_fmt_matrix(np.cov(Z_corr_b2, rowvar=False)))
 
     # Normality checks
     print("\n[Normality checks]")
-    for label, data in (("Z_uncorr", Z_uncorr), ("Z_corr", Z_corr)):
+    for label, data in (("Z_uncorr (B2)", Z_uncorr_b2), ("Z_corr (B2)", Z_corr_b2)):
         mean_vec = np.mean(data, axis=0)
         std_vec = np.std(data, axis=0, ddof=1)
         skew_vec = stats.skew(data, axis=0, bias=False)
@@ -93,9 +86,9 @@ def main():
         Z_full_crude = np.vstack((Z_half_1, Z_half_2))
         
         # Execute pricing functions
-        val_basic = price_basic(Z_full_crude)
-        val_b1 = price_bonus_1(Z_half_1)
-        val_b2 = price_bonus_2(Z_half_1)
+        val_basic = basic_method.price_basic(Z_full_crude)
+        val_b1 = bonus1.price_bonus_1(Z_half_1)
+        val_b2 = bonus2.price_bonus_2(Z_half_1)
         
         results_basic.append(val_basic)
         results_b1.append(val_b1)
